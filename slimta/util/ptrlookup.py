@@ -95,12 +95,17 @@ class PtrLookup(gevent.Greenlet):
         super(PtrLookup, self).start()
 
     def _run(self):
+        # StreamServer can return an ipv4 address with an ipv6 prefix "::ffff:"
+        # which is not handled correctly by gethostbyaddr and throws an error
+        ip = str(self.ip)
+        if ip.find("::ffff:") == 0:
+            ip = ip.replace("::ffff:", "")
         try:
-            hostname, _, _ = socket.gethostbyaddr(self.ip)
+            hostname, _, _ = socket.gethostbyaddr(ip)
         except (socket.herror, socket.gaierror, gevent.GreenletExit):
             pass
         except Exception:
-            logging.log_exception(__name__, query=self.ip)
+            logging.log_exception(__name__, query=ip)
         else:
             return hostname
 

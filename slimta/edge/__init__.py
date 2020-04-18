@@ -124,7 +124,7 @@ class EdgeServer(Edge, gevent.Greenlet):
         else:
             self.server = None
 
-    def _handle(self, socket, address):
+    def _handle(self, socket, address): 
         log.accept(self.server.socket, socket, address)
         try:
             self.handle(socket, address)
